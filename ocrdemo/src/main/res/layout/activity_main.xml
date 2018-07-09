@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context=".MainActivity">
+
+    <SurfaceView
+        android:id="@+id/svCamera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <com.lwy.ocrdemo.view.PreviewBorderView
+        android:id="@+id/borderView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <ImageView
+        android:id="@+id/ivCapturePhoto"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="20dp"
+        android:onClick="onClick"
+        android:src="@mipmap/capture_photo"/>
+
+
+</FrameLayout>
