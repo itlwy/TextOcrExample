@@ -7,7 +7,7 @@
 　  当然也有第三方提供的解决方案,比如百度提供的文字识别：http://ai.baidu.com/tech/ocr。
 　　咱做技术的还是先折腾折腾，特此记录下过程，也希望能帮助到同样折腾的人
 # 效果图
-![拍照](https://img-blog.csdn.net/20180709172027465?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXllX19MZWU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)  ![识别](https://img-blog.csdn.net/20180709171905519?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXllX19MZWU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![拍照](./pic/recResult.png)  ![识别](./pic/recScan.png)
 
 # 过程
 先理下要实现这样的效果，我们需要做些什么
@@ -24,10 +24,10 @@
 　　机器视觉分为三个阶段 : 图像转化、图像分析、图像理解。若要将一幅图像转化为方便分析理解的格式，有一个很关键的过程就是“图像二值化”。一幅图像能否分析理解的准确很大程度上来说取决于二值化(非黑即白)效果的好坏。而在二值化之前，有一个重要步骤，那便是“图像灰度化”
 	
 　　所以，先将图片灰度化，这里有个公式：f(x) = R*0.3+G*0.51+B*0.11，实际需要做的就是将图片的每个像素(这里假定android里用ARGB表示一个像素点)的red、green、blue取出并代入此公式算出每个点的灰度值，这样便实现了灰度化</br>
-　　![灰度化之前](https://img-blog.csdn.net/20180707154211990?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXllX19MZWU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)   ![这里写图片描述](https://img-blog.csdn.net/20180707154309748?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXllX19MZWU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)</br>
+　　![灰度化之前](./pic/girl_normal.jpeg)   ![这里写图片描述](./pic/girl_gray.jpeg)</br>
 　　再来看看二值化，二值化的原理就是取一个阈值，然后将每个像素点的灰度值和这个阈值进行比较，如果大于阈值则定为白色，反之为黑色(这里假定要识别的图像是白底黑字)，如此一来便实现了二值化。可以看到，最重要的是这个阈值，该怎么取值才合理，最简单的阈值取定便是取整幅图画的均值了：</br>
 　　
-　　![这里写图片描述](https://img-blog.csdn.net/20180707154455481?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXllX19MZWU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)   ![这里写图片描述](https://img-blog.csdn.net/20180707154505782?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXllX19MZWU=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)</br>
+　　![这里写图片描述](./pic/girl_gray.jpeg)   ![这里写图片描述](./pic/girl_binary.jpeg)</br>
 　　效果看上去还不错，实际上用到身份证识别或文字识别上，受阴影等因素的影响，效果就差很多了，因此，优化算法还是很有必要的，网上流传着多种二值化算阈值的算法，这里目前尝试了以下几种：
 　　　
 1. 阈值迭代算法(效果不理想，字体的笔画容易站在一起，阴影影响大)
