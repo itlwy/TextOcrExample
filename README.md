@@ -6,7 +6,7 @@
 　　GitHub：https://github.com/rmtheis/tess-two</br>
 　  当然也有第三方提供的解决方案,比如百度提供的文字识别：http://ai.baidu.com/tech/ocr。
 　　咱做技术的还是先折腾折腾，特此记录下过程，也希望能帮助到同样折腾的人
-# 效果图
+# 效果图(名字打了马赛克)
 ![拍照](./pic/recResult.png)  ![识别](./pic/recScan.png)
 
 # 过程
