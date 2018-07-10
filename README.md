@@ -130,3 +130,19 @@ PS：对于速度上的要求，个人觉得可以在网络畅通的情况下，
 # 参考
 1. [tesseract ocr训练样本库 识别字库](https://blog.csdn.net/qq_25806863/article/details/67637567)
 2. [tess-two](https://github.com/rmtheis/tess-two)
+
+# License<a id="sec-6" name="sec-6"></a>
+
+    Copyright 2018 lwy
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
