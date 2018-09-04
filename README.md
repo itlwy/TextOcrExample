@@ -4,8 +4,8 @@
 　　最近因为业务需要，要在Android端实现个扫描身份证识别其中文字的功能，网上溜达了一圈。</br>
 　　Android比较推荐的是: </br>
 　　GitHub：https://github.com/rmtheis/tess-two</br>
-　  当然也有第三方提供的解决方案,比如百度提供的文字识别：http://ai.baidu.com/tech/ocr。
-　　咱做技术的还是先折腾折腾,特此记录下过程,也希望能帮助到同样折腾的人,欢迎Star，欢迎Fork~
+　  当然也有第三方提供的解决方案,比如百度提供的文字识别：http://ai.baidu.com/tech/ocr。</br>
+   咱做技术的还是先折腾折腾,特此记录下过程,也希望能帮助到同样折腾的人,欢迎Star，欢迎Fork~
 # 效果图(名字打了马赛克)
 ![拍照](./pic/recResult.png)  ![识别](./pic/recScan.png)
 
