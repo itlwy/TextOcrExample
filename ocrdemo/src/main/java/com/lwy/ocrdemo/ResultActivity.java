@@ -88,18 +88,22 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                         if (--activity.mRecogRunningCount == 0) {
                             activity.mRecTimeEnd = System.currentTimeMillis();
                             activity.mRecTimetv.setText("文字识别耗时:" + (activity.mRecTimeStart - activity.mRecTimeEnd));
+                            if (activity.mDialog != null && activity.mDialog.isShowing()) {
+                                activity.mDialog.cancel();
+                            }
                         }
                         break;
                     case 2:
+                        if (activity.mDialog != null && activity.mDialog.isShowing()) {
+                            activity.mDialog.cancel();
+                        }
                         activity.handleBitmap();
                         break;
                     case 0:
                         Toast.makeText(activity, String.format("识别失败:%s", msg.obj), Toast.LENGTH_SHORT).show();
                         break;
                 }
-                if (activity.mDialog != null && activity.mDialog.isShowing()) {
-                    activity.mDialog.cancel();
-                }
+
             }
         }
     }
