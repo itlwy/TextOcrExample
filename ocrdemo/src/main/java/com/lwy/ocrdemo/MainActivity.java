@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             imgParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
         }
         mCapturePhoto.setLayoutParams(imgParams);
-        startPreview(mCamera, mSvHolder);
+        if (mCamera != null)
+            startPreview(mCamera, mSvHolder);
         super.onConfigurationChanged(newConfig);
     }
 

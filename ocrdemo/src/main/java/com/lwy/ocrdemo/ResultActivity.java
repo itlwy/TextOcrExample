@@ -28,9 +28,8 @@ import com.lwy.ocrdemo.utils.PictureHandler;
 import com.lwy.ocrdemo.utils.ThreadManager;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,27 +70,77 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     private Bitmap[] mBitmaps;
     private int mRecogRunningCount;
 
+    static class MyHandler extends Handler {
+
+        private WeakReference<ResultActivity> wf;
+
+        public MyHandler(ResultActivity activity) {
+            wf = new WeakReference(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if (wf.get() != null) {
+                ResultActivity activity = wf.get();
+                switch (msg.what) {
+                    case 1:
+                        activity.handleRecogResult(msg);
+                        if (--activity.mRecogRunningCount == 0) {
+                            activity.mRecTimeEnd = System.currentTimeMillis();
+                            activity.mRecTimetv.setText("文字识别耗时:" + (activity.mRecTimeStart - activity.mRecTimeEnd));
+                        }
+                        break;
+                    case 2:
+                        activity.handleBitmap();
+                        break;
+                    case 0:
+                        Toast.makeText(activity, String.format("识别失败:%s", msg.obj), Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                if (activity.mDialog != null && activity.mDialog.isShowing()) {
+                    activity.mDialog.cancel();
+                }
+            }
+        }
+    }
+
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-        init();
         initView();
-        handleBitmap();
+        init();
     }
 
     private void init() {
         File dataDir = new File(tessdata);
         if (!dataDir.exists()) {
             dataDir.mkdirs();
-        }
-        try {
-            FileUtil.assets2SDCard(this, "chi_sim.traineddata", tessdata + File.separator +
-                    language + ".traineddata");
-        } catch (IOException e) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+            mDialog = new ProgressDialog(ResultActivity.this);
+            mDialog.setMessage("拷贝训练数据中......");
+            mDialog.setCanceledOnTouchOutside(false);
+            mDialog.show();
+            ThreadManager.getInstance().createLongPool().execute(new Runnable() {
+                @Override
+                public void run() {
+
+                    Message msg;
+                    try {
+                        FileUtil.assets2SDCard(ResultActivity.this, "chi_sim.traineddata", tessdata + File.separator +
+                                language + ".traineddata");
+                        msg = Message.obtain();
+                        msg.what = 2;
+                    } catch (IOException e) {
+                        msg = Message.obtain();
+                        msg.what = 0;
+                        msg.obj = e.getMessage();
+                    }
+                    mHandler.sendMessage(msg);
+                }
+            });
+        } else {
+            handleBitmap();
         }
     }
 
@@ -112,26 +161,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         mPicTimetv = findViewById(R.id.pic_time_tv);
         mRecTimetv = findViewById(R.id.rec_time_tv);
         findViewById(R.id.button).setOnClickListener(this);
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case 1:
-                        handleRecogResult(msg);
-                        if (--mRecogRunningCount == 0) {
-                            mRecTimeEnd = System.currentTimeMillis();
-                            mRecTimetv.setText("文字识别耗时:" + (mRecTimeStart - mRecTimeEnd));
-                            mDialog.cancel();
-                        }
-                        break;
-                    case 0:
-                        Toast.makeText(ResultActivity.this, String.format("识别失败:%s", msg.obj), Toast.LENGTH_SHORT).show();
-                        break;
-                }
-
-            }
-        };
+        mHandler = new MyHandler(this);
     }
 
     private void handleBitmap() {
@@ -140,7 +170,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             protected void onPreExecute() {
                 mDialog = new ProgressDialog(ResultActivity.this);
                 mDialog.setMessage("图片处理中......");
-                mDialog.setCancelable(false);
+                mDialog.setCanceledOnTouchOutside(false);
                 mDialog.show();
             }
 
@@ -191,12 +221,10 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
                     bitmaps[6] = PictureHandler.getBinaryImage(bitmaps[6], PictureHandler.TYPE_MATRIX);
                 } catch (final Exception e) {
                     Log.d(this.getClass().getSimpleName(), e.toString());
-                    ResultActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(ResultActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    Message msg = Message.obtain();
+                    msg.what = 0;
+                    msg.obj = e.getMessage();
+                    mHandler.sendMessage(msg);
                 }
                 return bitmaps;
             }
@@ -309,7 +337,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(final View view) {
         mDialog = new ProgressDialog(view.getContext());
         mDialog.setMessage("识别中......");
-        mDialog.setCancelable(false);
+        mDialog.setCanceledOnTouchOutside(false);
         mDialog.show();
         mRecTimeStart = System.currentTimeMillis();
         ThreadManager.getInstance().createLongPool().execute(new RecRunnable(mBitmaps[1], 1, mHandler));

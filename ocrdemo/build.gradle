@@ -21,6 +21,12 @@ android {
         }
     }
 
+//    处理部分编译版本不一致冲突情况
+
+    configurations.all {
+        resolutionStrategy.force 'com.android.support:support-annotations:26.1.0'
+    }
+
 }
 
 dependencies {
