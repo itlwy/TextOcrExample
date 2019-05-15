@@ -23,10 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.lwy.ocrdemo.utils.FileUtil;
 import com.lwy.ocrdemo.utils.PictureHandler;
 import com.lwy.ocrdemo.utils.ThreadManager;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,6 +54,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
      * 在DATAPATH中新建这个目录，TessBaseAPI初始化要求必须有这个目录。
      */
     private static final String tessdata = DATA_PATH + File.separator + "tessdata";
+    public static String language = "chi_sim";
     private ImageView mImageView1;
     private ImageView mImageView2;
     private ImageView mImageView3;
@@ -71,10 +76,24 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+        init();
         initView();
         handleBitmap();
     }
 
+    private void init() {
+        File dataDir = new File(tessdata);
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
+        try {
+            FileUtil.assets2SDCard(this, "chi_sim.traineddata", tessdata + File.separator +
+                    language + ".traineddata");
+        } catch (IOException e) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
 
     private void initView() {
         mImageView1 = findViewById(R.id.image1);
@@ -313,6 +332,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
         private Handler mHandler;
         private Bitmap mBitmap;
 
+
         public RecRunnable(Bitmap bitmap, int type, Handler handler) {
             mBitmap = bitmap;
             mHandler = handler;
@@ -340,7 +360,7 @@ public class ResultActivity extends AppCompatActivity implements View.OnClickLis
             String retStr = "No result";
             try {
                 TessBaseAPI tessBaseAPI = new TessBaseAPI();
-                tessBaseAPI.init(DATA_PATH, "chi_sim");
+                tessBaseAPI.init(DATA_PATH, language);
                 // 识别黑名单
 //            tessBaseAPI.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "!@#$%^&*()_+=÷-[]}{;:'\"\\|~`," +
 //                    "./<>?" + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
